@@ -4,14 +4,10 @@ from helper_evaluation import compute_accuracy
 
 
 def train_model(model, num_epochs, train_loader,
-                valid_loader, test_loader, optimizer,
-                device, logging_interval=50,
-                scheduler=None,
-                scheduler_on='valid_acc'):
+                valid_loader, test_loader, optimizer, device):
 
     start_time = time.time()
     minibatch_loss_list, train_acc_list, valid_acc_list = [], [], []
-    
     for epoch in range(num_epochs):
 
         model.train()
@@ -32,7 +28,7 @@ def train_model(model, num_epochs, train_loader,
 
             # ## LOGGING
             minibatch_loss_list.append(loss.item())
-            if not batch_idx % logging_interval:
+            if not batch_idx % 50:
                 print(f'Epoch: {epoch+1:03d}/{num_epochs:03d} '
                       f'| Batch {batch_idx:04d}/{len(train_loader):04d} '
                       f'| Loss: {loss:.4f}')
@@ -49,16 +45,6 @@ def train_model(model, num_epochs, train_loader,
 
         elapsed = (time.time() - start_time)/60
         print(f'Time elapsed: {elapsed:.2f} min')
-        
-        if scheduler is not None:
-
-            if scheduler_on == 'valid_acc':
-                scheduler.step(valid_acc_list[-1])
-            elif scheduler_on == 'minibatch_loss':
-                scheduler.step(minibatch_loss_list[-1])
-            else:
-                raise ValueError(f'Invalid `scheduler_on` choice.')
-        
 
     elapsed = (time.time() - start_time)/60
     print(f'Total Training Time: {elapsed:.2f} min')

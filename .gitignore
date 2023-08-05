@@ -7,6 +7,7 @@ src/CNNs/data/cifar-10-batches-py/
 
 src/Practicals/data/FashionMNIST/
 src/Practicals/data/MNISTKaggleData/
+src/Practicals/data/MNIST/
 
 *.gz
 *.pt

@@ -15,7 +15,7 @@ def set_all_seeds(seed):
     torch.cuda.manual_seed_all(seed)
 
 
-def set_deterministic():
+def set_deterministic(use_tensorcores=False):
     if torch.cuda.is_available():
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
@@ -25,15 +25,20 @@ def set_deterministic():
     else:
         torch.use_deterministic_algorithms(True)
 
+        # The following are set to True by default and allow cards
+        # like the Ampere and newer to utilize tensorcores for
+        # convolutions and matrix multiplications, which can result
+        # in a significant speed-up. However, results may differ compared
+        # to card how don't use mixed precision via tensor cores.
+        torch.backends.cuda.matmul.allow_tf32 = use_tensorcores
+        torch.backends.cudnn.allow_tf32 = use_tensorcores
+
 
 def compute_accuracy(model, data_loader, device):
-
     with torch.no_grad():
-
         correct_pred, num_examples = 0, 0
 
         for i, (features, targets) in enumerate(data_loader):
-
             features = features.to(device)
             targets = targets.float().to(device)
 
@@ -42,16 +47,14 @@ def compute_accuracy(model, data_loader, device):
 
             num_examples += targets.size(0)
             correct_pred += (predicted_labels == targets).sum()
-    return correct_pred.float()/num_examples * 100
+    return correct_pred.float() / num_examples * 100
 
 
 def compute_confusion_matrix(model, data_loader, device):
-
     all_targets, all_predictions = [], []
     with torch.no_grad():
 
         for i, (features, targets) in enumerate(data_loader):
-
             features = features.to(device)
             targets = targets
             logits = model(features)
@@ -62,7 +65,7 @@ def compute_confusion_matrix(model, data_loader, device):
     all_predictions = all_predictions
     all_predictions = np.array(all_predictions)
     all_targets = np.array(all_targets)
-        
+
     class_labels = np.unique(np.concatenate((all_targets, all_predictions)))
     if class_labels.shape[0] == 1:
         if class_labels[0] != 0:

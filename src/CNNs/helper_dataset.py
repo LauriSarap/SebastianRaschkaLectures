@@ -16,7 +16,7 @@ class UnNormalize(object):
         Parameters:
         ------------
         tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
-        
+
         Returns:
         ------------
         Tensor: Normalized image.
@@ -30,7 +30,6 @@ def get_dataloaders_mnist(batch_size, num_workers=0,
                           validation_fraction=None,
                           train_transforms=None,
                           test_transforms=None):
-
     if train_transforms is None:
         train_transforms = transforms.ToTensor()
 
@@ -91,7 +90,6 @@ def get_dataloaders_cifar10(batch_size, num_workers=0,
                             validation_fraction=None,
                             train_transforms=None,
                             test_transforms=None):
-
     if train_transforms is None:
         train_transforms = transforms.ToTensor()
 
@@ -146,4 +144,3 @@ def get_dataloaders_cifar10(batch_size, num_workers=0,
         return train_loader, test_loader
     else:
         return train_loader, valid_loader, test_loader
-
