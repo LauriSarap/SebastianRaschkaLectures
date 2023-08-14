@@ -9,6 +9,9 @@ src/Practicals/data/FashionMNIST/
 src/Practicals/data/MNISTKaggleData/
 src/Practicals/data/MNIST/
 
+src/RNNsAndAutoEncoders/data/MNIST/
+src/RNNsAndAutoEncoders/movie_data.csv
+
 *.gz
 *.pt
 *.ckpt
