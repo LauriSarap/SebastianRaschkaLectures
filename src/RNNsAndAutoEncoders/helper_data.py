@@ -16,7 +16,7 @@ class UnNormalize(object):
         Parameters:
         ------------
         tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
-        
+
         Returns:
         ------------
         Tensor: Normalized image.
@@ -27,11 +27,12 @@ class UnNormalize(object):
 
 
 class ChunkSampler(sampler.Sampler):
-    """Samples elements sequentially from some offset. 
+    """Samples elements sequentially from some offset.
     Arguments:
         num_samples: # of desired datapoints
         start: offset where we should start selecting from
     """
+
     def __init__(self, num_samples, start=0):
         self.num_samples = num_samples
         self.start = start
@@ -46,7 +47,6 @@ class ChunkSampler(sampler.Sampler):
 def get_dataloaders_cifar10(batch_size, num_workers=0,
                             validation_fraction=None,
                             train_transforms=None, test_transforms=None):
-
     if train_transforms is None:
         train_transforms = transforms.ToTensor()
 
@@ -66,14 +66,13 @@ def get_dataloaders_cifar10(batch_size, num_workers=0,
                                     train=False,
                                     transform=test_transforms)
 
-
     if validation_fraction is not None:
         num = int(validation_fraction * 50000)
         train_indices = torch.arange(0, 50000 - num)
         valid_indices = torch.arange(50000 - num, 50000)
 
-        #train_sampler = SubsetRandomSampler(train_indices)
-        #valid_sampler = SubsetRandomSampler(valid_indices)
+        # train_sampler = SubsetRandomSampler(train_indices)
+        # valid_sampler = SubsetRandomSampler(valid_indices)
         train_sampler = ChunkSampler(train_indices.shape[0], 0)
         valid_sampler = ChunkSampler(valid_indices.shape[0], train_indices.shape[0])
 
@@ -108,7 +107,6 @@ def get_dataloaders_cifar10(batch_size, num_workers=0,
 def get_dataloaders_mnist(batch_size, num_workers=0,
                           validation_fraction=None,
                           train_transforms=None, test_transforms=None):
-
     if train_transforms is None:
         train_transforms = transforms.ToTensor()
 
@@ -162,7 +160,7 @@ def get_dataloaders_mnist(batch_size, num_workers=0,
     else:
         return train_loader, valid_loader, test_loader
 
-    
+
 def get_dataloaders_celeba(batch_size, num_workers=0,
                            train_transforms=None,
                            test_transforms=None,
@@ -170,7 +168,7 @@ def get_dataloaders_celeba(batch_size, num_workers=0,
     """Targets are 40-dim vectors representing
     00 - 5_o_Clock_Shadow
     01 - Arched_Eyebrows
-    02 - Attractive 
+    02 - Attractive
     03 - Bags_Under_Eyes
     04 - Bald
     05 - Bangs
@@ -178,36 +176,36 @@ def get_dataloaders_celeba(batch_size, num_workers=0,
     07 - Big_Nose
     08 - Black_Hair
     09 - Blond_Hair
-    10 - Blurry 
-    11 - Brown_Hair 
-    12 - Bushy_Eyebrows 
-    13 - Chubby 
-    14 - Double_Chin 
-    15 - Eyeglasses 
-    16 - Goatee 
-    17 - Gray_Hair 
-    18 - Heavy_Makeup 
-    19 - High_Cheekbones 
-    20 - Male 
-    21 - Mouth_Slightly_Open 
-    22 - Mustache 
-    23 - Narrow_Eyes 
-    24 - No_Beard 
-    25 - Oval_Face 
-    26 - Pale_Skin 
-    27 - Pointy_Nose 
-    28 - Receding_Hairline 
-    29 - Rosy_Cheeks 
-    30 - Sideburns 
-    31 - Smiling 
-    32 - Straight_Hair 
-    33 - Wavy_Hair 
-    34 - Wearing_Earrings 
-    35 - Wearing_Hat 
-    36 - Wearing_Lipstick 
-    37 - Wearing_Necklace 
-    38 - Wearing_Necktie 
-    39 - Young         
+    10 - Blurry
+    11 - Brown_Hair
+    12 - Bushy_Eyebrows
+    13 - Chubby
+    14 - Double_Chin
+    15 - Eyeglasses
+    16 - Goatee
+    17 - Gray_Hair
+    18 - Heavy_Makeup
+    19 - High_Cheekbones
+    20 - Male
+    21 - Mouth_Slightly_Open
+    22 - Mustache
+    23 - Narrow_Eyes
+    24 - No_Beard
+    25 - Oval_Face
+    26 - Pale_Skin
+    27 - Pointy_Nose
+    28 - Receding_Hairline
+    29 - Rosy_Cheeks
+    30 - Sideburns
+    31 - Smiling
+    32 - Straight_Hair
+    33 - Wavy_Hair
+    34 - Wearing_Earrings
+    35 - Wearing_Hat
+    36 - Wearing_Lipstick
+    37 - Wearing_Necklace
+    38 - Wearing_Necktie
+    39 - Young
     """
 
     if train_transforms is None:
@@ -229,20 +227,52 @@ def get_dataloaders_celeba(batch_size, num_workers=0,
                                    split='test',
                                    transform=test_transforms)
 
-
     train_loader = DataLoader(dataset=train_dataset,
                               batch_size=batch_size,
                               num_workers=num_workers,
                               shuffle=True)
 
     valid_loader = DataLoader(dataset=test_dataset,
-                             batch_size=batch_size,
-                             num_workers=num_workers,
-                             shuffle=False)
-    
+                              batch_size=batch_size,
+                              num_workers=num_workers,
+                              shuffle=False)
+
     test_loader = DataLoader(dataset=test_dataset,
                              batch_size=batch_size,
                              num_workers=num_workers,
                              shuffle=False)
 
     return train_loader, valid_loader, test_loader
+
+
+def compute_average_faces(feature_idx, image_dim, data_loader, device=None, encoding_fn=None):
+    avg_img_with_feat = torch.zeros(image_dim, dtype=torch.float32)
+    avg_img_without_feat = torch.zeros(image_dim, dtype=torch.float32)
+
+    num_img_with_feat = 0
+    num_images_without_feat = 0
+
+    for images, labels in data_loader:
+        idx_img_with_feat = labels[:, feature_idx].to(torch.bool)
+
+        if encoding_fn is None:
+            embeddings = images
+        else:
+            ####################################
+            ### Get latent representation
+            with torch.no_grad():
+
+                if device is not None:
+                    images = images.to(device)
+                embeddings = encoding_fn(images).to('cpu')
+            ####################################
+
+        avg_img_with_feat += torch.sum(embeddings[idx_img_with_feat], axis=0)
+        avg_img_without_feat += torch.sum(embeddings[~idx_img_with_feat], axis=0)
+        num_img_with_feat += idx_img_with_feat.sum(axis=0)
+        num_images_without_feat += (~idx_img_with_feat).sum(axis=0)
+
+    avg_img_with_feat /= num_img_with_feat
+    avg_img_without_feat /= num_images_without_feat
+
+    return avg_img_with_feat, avg_img_without_feat

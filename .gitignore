@@ -11,6 +11,7 @@ src/Practicals/data/MNIST/
 
 src/RNNsAndAutoEncoders/data/MNIST/
 src/RNNsAndAutoEncoders/movie_data.csv
+src/RNNsAndAutoEncoders/data/celeba/
 
 *.gz
 *.pt

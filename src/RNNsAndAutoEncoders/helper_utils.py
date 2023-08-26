@@ -8,7 +8,7 @@ def set_deterministic():
     if torch.cuda.is_available():
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
-    torch.set_deterministic(True)
+    #torch.set_deterministic(True)
     
     
 def set_all_seeds(seed):
